@@ -8,10 +8,12 @@
 
 import UIKit
 import AFNetworking
+import MBProgressHUD
 
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     @IBOutlet weak var tableView: UITableView!
     var movies:[NSDictionary]?
+    var page = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,6 +21,41 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.dataSource = self
         tableView.delegate = self
         
+        page += 1
+        
+        loadMovies(at: page)
+        
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(loadMovies(_:)), for: .valueChanged)
+        tableView.insertSubview(refreshControl, at: 0)
+    }
+    
+    func loadMovies(at page:Int) {
+        
+        let apiKey = "16e4d20620e968bb2ac7b6075dd69d43"
+        let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)&page=\(page)")!
+        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
+        let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
+        MBProgressHUD.showAdded(to: self.view, animated: true)
+        let task: URLSessionDataTask = session.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) in
+            if let data = data {
+                if let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
+                    if self.movies == nil || self.movies?.count == 0 {
+                        self.movies = dataDictionary["results"] as? [NSDictionary]
+                    }
+                    else {
+                        self.movies! += (dataDictionary["results"] as! [NSDictionary])
+                    }
+                    self.tableView.reloadData()
+                }
+            }
+            MBProgressHUD.hide(for: self.view, animated: true)
+        }
+        task.resume()
+        
+    }
+    
+    func loadMovies(_ refreshControl:UIRefreshControl) {
         
         let apiKey = "16e4d20620e968bb2ac7b6075dd69d43"
         let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")!
@@ -29,12 +66,14 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 if let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
                     self.movies = dataDictionary["results"] as? [NSDictionary]
                     self.tableView.reloadData()
+                    
+                    refreshControl.endRefreshing()
                 }
             }
         }
         task.resume()
         
-        
+
     }
 
     override func didReceiveMemoryWarning() {
@@ -50,15 +89,18 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "movieCell", for: indexPath) as! MovieCell
         
         guard let movies = movies else {
             return cell
         }
+        
         let movie = movies[indexPath.row]
-        let title = movie["title"] as! String
-        let overview = movie["overview"] as! String
-        let posterPath = movie["poster_path"] as! String
+        
+        guard let title = movie["title"] as? String, let overview = movie["overview"] as? String, let posterPath = movie["poster_path"] as? String else {
+            return cell
+        }
         
         let baseURL = "https://image.tmdb.org/t/p/w500"
         let imageURL = NSURL(string: baseURL + posterPath)
@@ -68,6 +110,13 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         cell.posterView.setImageWith(imageURL as! URL)
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if (indexPath.row >= tableView.numberOfRows(inSection: 0) - 1) {
+            page += 1
+            loadMovies(at: page)
+        }
     }
 
     /*
