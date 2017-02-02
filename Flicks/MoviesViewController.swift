@@ -12,9 +12,17 @@ import MBProgressHUD
 
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var networkErrorButton: UIButton!
+    
     var movies:[NSDictionary]?
     var page = 0
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        
+        networkErrorButton.isHidden = true
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -31,13 +39,17 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func loadMovies(at page:Int) {
-        
         let apiKey = "16e4d20620e968bb2ac7b6075dd69d43"
         let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)&page=\(page)")!
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
         let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
         MBProgressHUD.showAdded(to: self.view, animated: true)
         let task: URLSessionDataTask = session.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) in
+            
+            if error != nil {
+                self.animateNetworkErrorButton()
+            }
+            
             if let data = data {
                 if let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
                     if self.movies == nil || self.movies?.count == 0 {
@@ -62,6 +74,11 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
         let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
         let task: URLSessionDataTask = session.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) in
+            
+            if error != nil {
+                self.animateNetworkErrorButton()
+            }
+            
             if let data = data {
                 if let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
                     self.movies = dataDictionary["results"] as? [NSDictionary]
@@ -118,15 +135,27 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             loadMovies(at: page)
         }
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    
+    @IBAction func networkErrorButtonTapped(_ sender: Any) {
+        UIView.animate(withDuration: 0.3, animations: {
+            let yValue = UIApplication.shared.statusBarFrame.height
+            self.networkErrorButton.frame = CGRect(x: 0, y: 0 - self.networkErrorButton.frame.height + yValue, width: self.networkErrorButton.frame.width, height: self.networkErrorButton.frame.height)
+        }, completion: { (isComplete) in
+            self.networkErrorButton.isHidden = true
+        })
+        
+        loadMovies(at: page)
     }
-    */
+    
+    
+    
+    func animateNetworkErrorButton() {
+        UIView.animate(withDuration: 0.3, animations: {
+            self.page = 1
+            self.networkErrorButton.isHidden = false
+            let yValue = UIApplication.shared.statusBarFrame.height
+            self.networkErrorButton.frame = CGRect(x: 0, y: yValue, width: self.networkErrorButton.frame.width, height: self.networkErrorButton.frame.height)
+        })
+    }
 
 }
