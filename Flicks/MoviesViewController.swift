@@ -77,6 +77,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             
             if error != nil {
                 self.animateNetworkErrorButton()
+                refreshControl.endRefreshing()
             }
             
             if let data = data {
@@ -151,7 +152,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     func animateNetworkErrorButton() {
         UIView.animate(withDuration: 0.3, animations: {
-            self.page = 1
             self.networkErrorButton.isHidden = false
             let yValue = UIApplication.shared.statusBarFrame.height
             self.networkErrorButton.frame = CGRect(x: 0, y: yValue, width: self.networkErrorButton.frame.width, height: self.networkErrorButton.frame.height)
