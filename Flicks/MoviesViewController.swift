@@ -10,13 +10,16 @@ import UIKit
 import AFNetworking
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var networkErrorButton: UIButton!
+    @IBOutlet weak var movieSearchBar: UISearchBar!
     
     var movies:[NSDictionary]?
     var page = 0
-
+    
+    var filteredMovies:[NSDictionary] = []
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         
@@ -28,6 +31,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
 
         tableView.dataSource = self
         tableView.delegate = self
+        movieSearchBar.delegate = self
         
         page += 1
         
@@ -58,6 +62,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     else {
                         self.movies! += (dataDictionary["results"] as! [NSDictionary])
                     }
+                    self.filteredMovies = self.movies!
                     self.tableView.reloadData()
                 }
             }
@@ -68,6 +73,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func loadMovies(_ refreshControl:UIRefreshControl) {
+        
+        if !networkErrorButton.isHidden {
+            animateRetractingNetworkErrorButton()
+        }
         
         let apiKey = "16e4d20620e968bb2ac7b6075dd69d43"
         let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")!
@@ -83,6 +92,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             if let data = data {
                 if let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
                     self.movies = dataDictionary["results"] as? [NSDictionary]
+                    self.filteredMovies = self.movies!
                     self.tableView.reloadData()
                     
                     refreshControl.endRefreshing()
@@ -94,27 +104,15 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
 
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if let movies = movies {
-            return movies.count
-        }
-        return 0
+        return filteredMovies.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "movieCell", for: indexPath) as! MovieCell
         
-        guard let movies = movies else {
-            return cell
-        }
-        
-        let movie = movies[indexPath.row]
+        let movie = filteredMovies[indexPath.row]
         
         guard let title = movie["title"] as? String, let overview = movie["overview"] as? String, let posterPath = movie["poster_path"] as? String else {
             return cell
@@ -131,30 +129,57 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if (indexPath.row >= tableView.numberOfRows(inSection: 0) - 1) {
+        if movieSearchBar.isFirstResponder {
+            return
+        }
+        if indexPath.row >= tableView.numberOfRows(inSection: 0) - 1 {
             page += 1
             loadMovies(at: page)
         }
     }
     
-    @IBAction func networkErrorButtonTapped(_ sender: Any) {
-        UIView.animate(withDuration: 0.3, animations: {
-            let yValue = UIApplication.shared.statusBarFrame.height
-            self.networkErrorButton.frame = CGRect(x: 0, y: 0 - self.networkErrorButton.frame.height + yValue, width: self.networkErrorButton.frame.width, height: self.networkErrorButton.frame.height)
-        }, completion: { (isComplete) in
-            self.networkErrorButton.isHidden = true
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        let filtered = searchText.isEmpty ? movies : movies?.filter({ (dataDictionary: NSDictionary) -> Bool in
+            let dataString = dataDictionary["title"] as! String
+            return dataString.lowercased().range(of: searchText.lowercased()) != nil
         })
-        
-        loadMovies(at: page)
+        filteredMovies = filtered ?? []
+        tableView.reloadData()
     }
     
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        movieSearchBar.showsCancelButton = true
+    }
     
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        movieSearchBar.showsCancelButton = false
+        movieSearchBar.text = ""
+        movieSearchBar.resignFirstResponder()
+        
+        filteredMovies = movies ?? []
+        tableView.reloadData()
+    }
+    
+    @IBAction func networkErrorButtonTapped(_ sender: Any) {
+        animateRetractingNetworkErrorButton()
+        loadMovies(at: page)
+    }
     
     func animateNetworkErrorButton() {
         UIView.animate(withDuration: 0.3, animations: {
             self.networkErrorButton.isHidden = false
-            let yValue = UIApplication.shared.statusBarFrame.height
+            let yValue = UIApplication.shared.statusBarFrame.height + self.movieSearchBar.frame.height - 1
             self.networkErrorButton.frame = CGRect(x: 0, y: yValue, width: self.networkErrorButton.frame.width, height: self.networkErrorButton.frame.height)
+        })
+    }
+    
+    func animateRetractingNetworkErrorButton() {
+        UIView.animate(withDuration: 0.3, animations: {
+            let yValue = UIApplication.shared.statusBarFrame.height + self.movieSearchBar.frame.height
+            self.networkErrorButton.frame = CGRect(x: 0, y: 0 - self.networkErrorButton.frame.height + yValue, width: self.networkErrorButton.frame.width, height: self.networkErrorButton.frame.height)
+        }, completion: { (isComplete) in
+            self.networkErrorButton.isHidden = true
         })
     }
 
