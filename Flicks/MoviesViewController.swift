@@ -56,6 +56,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(loadMovies(_:)), for: .valueChanged)
         tableView.insertSubview(refreshControl, at: 0)
+        collectionView.insertSubview(refreshControl, at: 0)
     }
     
     func loadMovies(at page:Int) {
@@ -203,6 +204,16 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         return cell
     }
     
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if movieSearchBar.isFirstResponder {
+            return
+        }
+        if indexPath.row >= collectionView.numberOfItems(inSection: 0) - 1 {
+            page += 1
+            loadMovies(at: page)
+        }
+    }
+    
     
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -252,7 +263,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
     @IBAction func onPinchGesture(_ sender: UIPinchGestureRecognizer) {
-        print(sender.scale)
         var pinchScale  = sender.scale
         if sender.scale < 1 && !onFront {
             if sender.scale < 0.2 {
