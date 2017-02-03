@@ -10,10 +10,12 @@ import UIKit
 import AFNetworking
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UICollectionViewDelegate, UICollectionViewDataSource {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var networkErrorButton: UIButton!
     @IBOutlet weak var movieSearchBar: UISearchBar!
+    @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
     var movies:[NSDictionary]?
     var page = 0
@@ -31,7 +33,17 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
 
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.alpha = 0
+        
         movieSearchBar.delegate = self
+        
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.alpha = 1
+        flowLayout.scrollDirection = .vertical
+        flowLayout.minimumLineSpacing = 0
+        flowLayout.minimumInteritemSpacing = 0
+        flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         
         page += 1
         
@@ -64,6 +76,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     }
                     self.filteredMovies = self.movies!
                     self.tableView.reloadData()
+                    self.collectionView.reloadData()
                 }
             }
             MBProgressHUD.hide(for: self.view, animated: true)
@@ -94,6 +107,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     self.movies = dataDictionary["results"] as? [NSDictionary]
                     self.filteredMovies = self.movies!
                     self.tableView.reloadData()
+                    self.collectionView.reloadData()
                     
                     refreshControl.endRefreshing()
                 }
@@ -151,6 +165,42 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return filteredMovies.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "movieCollectionCell", for: indexPath) as! MovieCollectionViewCell
+        
+        let movie = filteredMovies[indexPath.row]
+        
+        guard let posterPath = movie["poster_path"] as? String else {
+            return cell
+        }
+        
+        let baseURL = "https://image.tmdb.org/t/p/w500"
+        let imageRequest = URLRequest(url: URL(string: baseURL + posterPath)!)
+        
+        cell.posterView.setImageWith(imageRequest, placeholderImage: nil, success: { (imageRequest, response, image) in
+            if response != nil {
+                cell.posterView.alpha = 0
+                cell.posterView.image = image
+                UIView.animate(withDuration: 0.3, animations: {
+                    cell.posterView.alpha = 1
+                })
+            }
+            else {
+                cell.posterView.image = image
+            }
+        }) { (imageRequest, response, error) in
+        }
+        
+        
+        return cell
+    }
+    
+    
+    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         let filtered = searchText.isEmpty ? movies : movies?.filter({ (dataDictionary: NSDictionary) -> Bool in
             let dataString = dataDictionary["title"] as! String
@@ -158,6 +208,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         })
         filteredMovies = filtered ?? []
         tableView.reloadData()
+        collectionView.reloadData()
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
@@ -171,6 +222,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         filteredMovies = movies ?? []
         tableView.reloadData()
+        collectionView.reloadData()
     }
     
     @IBAction func networkErrorButtonTapped(_ sender: Any) {
@@ -195,4 +247,36 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         })
     }
 
+    @IBAction func onPinchGesture(_ sender: UIPinchGestureRecognizer) {
+        print(sender.scale)
+        var pinchScale  = sender.scale
+        if sender.scale < 1 {
+            if sender.scale < 0.2 {
+                pinchScale = 0.2
+            }
+            tableView.alpha = pinchScale
+            collectionView.alpha = 1 - pinchScale
+            if sender.state == UIGestureRecognizerState.ended {
+                UIView.animate(withDuration: 0.2, animations: { 
+                    self.collectionView.alpha = 1
+                }, completion: { (complete) in
+                    self.tableView.alpha = 0
+                })
+            }
+        }
+        else {
+            if sender.scale > 5 {
+                pinchScale = 5
+            }
+            tableView.alpha = pinchScale / 6.25
+            collectionView.alpha = 1 - (pinchScale / 6.25)
+            if sender.state == UIGestureRecognizerState.ended {
+                UIView.animate(withDuration: 0.2, animations: { 
+                    self.tableView.alpha = 1
+                }, completion: { (complete) in
+                    self.collectionView.alpha = 0
+                })
+            }
+        }
+    }
 }
