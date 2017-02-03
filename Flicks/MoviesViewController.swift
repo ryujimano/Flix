@@ -20,12 +20,18 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     var movies:[NSDictionary]?
     var page = 0
     
+    var onFront: Bool = true
+    
     var filteredMovies:[NSDictionary] = []
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         
         networkErrorButton.isHidden = true
+        tableView.alpha = 0
+        collectionView.alpha = 1
+        
+        tableView.isUserInteractionEnabled = false
     }
     
     override func viewDidLoad() {
@@ -33,13 +39,11 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
 
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.alpha = 0
         
         movieSearchBar.delegate = self
         
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.alpha = 1
         flowLayout.scrollDirection = .vertical
         flowLayout.minimumLineSpacing = 0
         flowLayout.minimumInteritemSpacing = 0
@@ -250,32 +254,52 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     @IBAction func onPinchGesture(_ sender: UIPinchGestureRecognizer) {
         print(sender.scale)
         var pinchScale  = sender.scale
-        if sender.scale < 1 {
+        if sender.scale < 1 && !onFront {
             if sender.scale < 0.2 {
                 pinchScale = 0.2
             }
             tableView.alpha = pinchScale
             collectionView.alpha = 1 - pinchScale
-            if sender.state == UIGestureRecognizerState.ended {
-                UIView.animate(withDuration: 0.2, animations: { 
+            if pinchScale <= 0.8 && sender.state == UIGestureRecognizerState.ended {
+                onFront = true
+                UIView.animate(withDuration: 0.3, animations: {
                     self.collectionView.alpha = 1
                 }, completion: { (complete) in
                     self.tableView.alpha = 0
+                    self.collectionView.isUserInteractionEnabled = true
+                    self.tableView.isUserInteractionEnabled = false
                 })
             }
         }
-        else {
+        else if sender.scale > 1 && onFront {
             if sender.scale > 5 {
                 pinchScale = 5
             }
             tableView.alpha = pinchScale / 6.25
             collectionView.alpha = 1 - (pinchScale / 6.25)
-            if sender.state == UIGestureRecognizerState.ended {
-                UIView.animate(withDuration: 0.2, animations: { 
+            if pinchScale >= 1.2 && sender.state == UIGestureRecognizerState.ended {
+                onFront = false
+                UIView.animate(withDuration: 0.3, animations: {
                     self.tableView.alpha = 1
-                }, completion: { (complete) in
                     self.collectionView.alpha = 0
+                }, completion: { (complete) in
+                    self.tableView.isUserInteractionEnabled = true
+                    self.collectionView.isUserInteractionEnabled = false
                 })
+            }
+        }
+        if 0.8 < pinchScale && pinchScale < 1.2 && sender.state == UIGestureRecognizerState.ended {
+            if onFront {
+                collectionView.alpha = 1
+                tableView.alpha = 0
+                self.tableView.isUserInteractionEnabled = false
+                self.collectionView.isUserInteractionEnabled = true
+            }
+            else {
+                collectionView.alpha = 0
+                tableView.alpha = 1
+                self.tableView.isUserInteractionEnabled = true
+                self.collectionView.isUserInteractionEnabled = false
             }
         }
     }
