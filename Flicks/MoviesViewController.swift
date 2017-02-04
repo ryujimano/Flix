@@ -24,6 +24,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     var filteredMovies:[NSDictionary] = []
     
+    
+    let refreshControl = UIRefreshControl()
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         
@@ -53,9 +56,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         loadMovies(at: page)
         
-        let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(loadMovies(_:)), for: .valueChanged)
-        tableView.insertSubview(refreshControl, at: 0)
         collectionView.insertSubview(refreshControl, at: 0)
     }
     
@@ -264,6 +265,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
 
     @IBAction func onPinchGesture(_ sender: UIPinchGestureRecognizer) {
         var pinchScale  = sender.scale
+        
         if sender.scale < 1 && !onFront {
             if sender.scale < 0.2 {
                 pinchScale = 0.2
@@ -278,6 +280,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     self.tableView.alpha = 0
                     self.collectionView.isUserInteractionEnabled = true
                     self.tableView.isUserInteractionEnabled = false
+                    self.collectionView.insertSubview(self.refreshControl, at: 0)
                 })
             }
         }
@@ -295,6 +298,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 }, completion: { (complete) in
                     self.tableView.isUserInteractionEnabled = true
                     self.collectionView.isUserInteractionEnabled = false
+                    self.tableView.insertSubview(self.refreshControl, at: 0)
                 })
             }
         }
