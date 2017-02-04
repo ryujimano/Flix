@@ -216,7 +216,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     
-    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         let filtered = searchText.isEmpty ? movies : movies?.filter({ (dataDictionary: NSDictionary) -> Bool in
             let dataString = dataDictionary["title"] as! String
@@ -265,8 +264,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
 
     @IBAction func onPinchGesture(_ sender: UIPinchGestureRecognizer) {
         var pinchScale  = sender.scale
-        
         if sender.scale < 1 && !onFront {
+            if let indexPath = tableView.indexPathsForVisibleRows?[0] {
+                collectionView.scrollToItem(at: indexPath, at: .top, animated: false)
+            }
             if sender.scale < 0.2 {
                 pinchScale = 0.2
             }
@@ -285,6 +286,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             }
         }
         else if sender.scale > 1 && onFront {
+            tableView.scrollToRow(at: collectionView.indexPathsForVisibleItems[0], at: .top, animated: false)
             if sender.scale > 5 {
                 pinchScale = 5
             }
@@ -304,12 +306,16 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         }
         if 0.8 < pinchScale && pinchScale < 1.2 && sender.state == UIGestureRecognizerState.ended {
             if onFront {
+                tableView.scrollToRow(at: collectionView.indexPathsForVisibleItems[0], at: .top, animated: false)
                 collectionView.alpha = 1
                 tableView.alpha = 0
                 self.tableView.isUserInteractionEnabled = false
                 self.collectionView.isUserInteractionEnabled = true
             }
             else {
+                if let indexPath = tableView.indexPathsForVisibleRows?[0] {
+                    collectionView.scrollToItem(at: indexPath, at: .top, animated: false)
+                }
                 collectionView.alpha = 0
                 tableView.alpha = 1
                 self.tableView.isUserInteractionEnabled = true
