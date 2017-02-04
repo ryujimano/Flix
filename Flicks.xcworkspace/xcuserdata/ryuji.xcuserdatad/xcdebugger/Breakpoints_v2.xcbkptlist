@@ -2,4 +2,102 @@
 <Bucket
    type = "0"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Flicks/MoviesViewController.swift"
+            timestampString = "507933451.003443"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "72"
+            endingLineNumber = "72"
+            landmarkName = "loadMovies(at:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Flicks.MoviesViewController.loadMovies (at : Swift.Int) -&gt; ()"
+                  moduleName = "Flicks"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ryuji/Documents/Flicks/Flicks/MoviesViewController.swift"
+                  timestampString = "507929452.449051"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "71"
+                  endingLineNumber = "71"
+                  offsetFromSymbolStart = "1060">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Flicks.MoviesViewController.(loadMovies (at : Swift.Int) -&gt; ()).(closure #1)"
+                  moduleName = "Flicks"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ryuji/Documents/Flicks/Flicks/MoviesViewController.swift"
+                  timestampString = "507929452.451779"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "73"
+                  endingLineNumber = "73"
+                  offsetFromSymbolStart = "32">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Flicks/MoviesViewController.swift"
+            timestampString = "507933451.003443"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "72"
+            endingLineNumber = "72"
+            landmarkName = "loadMovies(at:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Flicks.MoviesViewController.loadMovies (at : Swift.Int) -&gt; ()"
+                  moduleName = "Flicks"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ryuji/Documents/Flicks/Flicks/MoviesViewController.swift"
+                  timestampString = "507929409.591954"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "71"
+                  endingLineNumber = "71"
+                  offsetFromSymbolStart = "1060">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Flicks.MoviesViewController.(loadMovies (at : Swift.Int) -&gt; ()).(closure #1)"
+                  moduleName = "Flicks"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ryuji/Documents/Flicks/Flicks/MoviesViewController.swift"
+                  timestampString = "507929409.595256"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "73"
+                  endingLineNumber = "73"
+                  offsetFromSymbolStart = "32">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

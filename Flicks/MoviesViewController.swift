@@ -16,6 +16,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     @IBOutlet weak var movieSearchBar: UISearchBar!
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
+    @IBOutlet var pinchGestureRecognizer: UIPinchGestureRecognizer!
+    
     
     var movies:[NSDictionary]?
     var page = 0
@@ -61,6 +63,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func loadMovies(at page:Int) {
+        pinchGestureRecognizer.isEnabled = false
         let apiKey = "16e4d20620e968bb2ac7b6075dd69d43"
         let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)&page=\(page)")!
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
@@ -88,7 +91,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             MBProgressHUD.hide(for: self.view, animated: true)
         }
         task.resume()
-        
+        pinchGestureRecognizer.isEnabled = true
     }
     
     func loadMovies(_ refreshControl:UIRefreshControl) {
@@ -157,6 +160,110 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         }) { (imageRequest, response, error) in
         }
         
+        if let rating = movie["vote_average"] as? Double {
+            if rating < 1.6 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 0
+                cell.star3.alpha = 0
+                cell.star4.alpha = 0
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-4-240")
+            }
+            else if rating < 2.5 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 0
+                cell.star3.alpha = 0
+                cell.star4.alpha = 0
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+            }
+            else if rating < 3.6 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 0
+                cell.star4.alpha = 0
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-4-240")
+            }
+            else if rating < 4.5 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 0
+                cell.star4.alpha = 0
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+            }
+            else if rating < 5.6 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 1
+                cell.star4.alpha = 0
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star3.image = #imageLiteral(resourceName: "iconmonstr-star-4-240")
+            }
+            else if rating < 6.5 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 1
+                cell.star4.alpha = 0
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star3.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+            }
+            else if rating < 7.6 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 1
+                cell.star4.alpha = 1
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star3.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star4.image = #imageLiteral(resourceName: "iconmonstr-star-4-240")
+            }
+            else if rating < 8.5 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 1
+                cell.star4.alpha = 1
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star3.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star4.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                
+            }
+            else if rating < 9.6 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 1
+                cell.star4.alpha = 1
+                cell.star5.alpha = 1
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star3.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star4.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star5.image = #imageLiteral(resourceName: "iconmonstr-star-4-240")
+            }
+            else {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 1
+                cell.star4.alpha = 1
+                cell.star5.alpha = 1
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star3.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star4.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star5.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+            }
+        }
+        
         return cell
     }
     
@@ -201,6 +308,108 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         }) { (imageRequest, response, error) in
         }
         
+        if let rating = movie["vote_average"] as? Double {
+            if rating < 1.6 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 0
+                cell.star3.alpha = 0
+                cell.star4.alpha = 0
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-4-240")
+            }
+            else if rating < 2.5 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 0
+                cell.star3.alpha = 0
+                cell.star4.alpha = 0
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+            }
+            else if rating < 3.6 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 0
+                cell.star4.alpha = 0
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-4-240")
+            }
+            else if rating < 4.5 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 0
+                cell.star4.alpha = 0
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+            }
+            else if rating < 5.6 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 1
+                cell.star4.alpha = 0
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star3.image = #imageLiteral(resourceName: "iconmonstr-star-4-240")
+            }
+            else if rating < 6.5 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 1
+                cell.star4.alpha = 0
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star3.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+            }
+            else if rating < 7.6 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 1
+                cell.star4.alpha = 1
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star3.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star4.image = #imageLiteral(resourceName: "iconmonstr-star-4-240")
+            }
+            else if rating < 8.5 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 1
+                cell.star4.alpha = 1
+                cell.star5.alpha = 0
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star3.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star4.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+            }
+            else if rating < 9.6 {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 1
+                cell.star4.alpha = 1
+                cell.star5.alpha = 1
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star3.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star4.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star5.image = #imageLiteral(resourceName: "iconmonstr-star-4-240")
+            }
+            else {
+                cell.star1.alpha = 1
+                cell.star2.alpha = 1
+                cell.star3.alpha = 1
+                cell.star4.alpha = 1
+                cell.star5.alpha = 1
+                cell.star1.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star2.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star3.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star4.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+                cell.star5.image = #imageLiteral(resourceName: "iconmonstr-star-3-240")
+            }
+        }
         
         return cell
     }
