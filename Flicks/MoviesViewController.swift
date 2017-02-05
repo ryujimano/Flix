@@ -26,6 +26,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     var filteredMovies:[NSDictionary] = []
     
+    let refreshContents = Bundle.main.loadNibNamed("RefreshView", owner: self, options: nil)
+    var customView: UIView!
+    var icon: UIImageView!
+    
     
     let refreshControl = UIRefreshControl()
     
@@ -41,6 +45,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
 
         tableView.dataSource = self
         tableView.delegate = self
@@ -58,8 +63,35 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         loadMovies(at: page)
         
+        customView = refreshContents?[0] as! UIView
+        icon = customView.viewWithTag(1) as! UIImageView
+        icon.tintColor = .lightGray
+        
+        refreshControl.tintColor = .clear
+        refreshControl.backgroundColor = .clear
+        setUpRefreshControl()
         refreshControl.addTarget(self, action: #selector(loadMovies(_:)), for: .valueChanged)
         collectionView.insertSubview(refreshControl, at: 0)
+    }
+    
+    func setUpRefreshControl() {
+        customView.frame = refreshControl.bounds
+        
+        UIView.animate(withDuration: 0.5, delay: 0, options: [.autoreverse, .curveLinear, .repeat], animations: { 
+            self.customView.backgroundColor = .black
+            self.customView.backgroundColor = .yellow
+        }, completion: nil)
+        
+        refreshControl.addSubview(customView)
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if refreshControl.bounds.height > 1  && refreshControl.bounds.height <= 60 {
+            icon.transform = CGAffineTransform(rotationAngle: CGFloat(M_PI) + CGFloat(M_PI) * (refreshControl.bounds.height / CGFloat(60)))
+        }
+        else if refreshControl.bounds.height > 60 {
+            icon.transform = CGAffineTransform(rotationAngle: CGFloat(0))
+        }
     }
     
     func loadMovies(at page:Int) {
