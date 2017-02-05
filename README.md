@@ -37,7 +37,7 @@ Please list two areas of the assignment you'd like to **discuss further with you
 
 Here's a walkthrough of implemented user stories:
 
-![alt text](https://github.com/ryujimano/Flicks/FlicksDemo.gif "FlicksDemo")
+![alt text](https://github.com/ryujimano/Flicks/blob/master/FlicksDemo.gif "FlicksDemo")
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
