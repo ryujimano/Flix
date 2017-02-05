@@ -77,7 +77,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             
             if let data = data {
                 if let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
-                    if self.movies == nil || self.movies?.count == 0 {
+                    if self.movies == nil || self.movies?.count == 0 || page == 1 {
                         self.movies = dataDictionary["results"] as? [NSDictionary]
                     }
                     else {
@@ -98,6 +98,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         if !networkErrorButton.isHidden {
             animateRetractingNetworkErrorButton()
+            refreshControl.endRefreshing()
+            return
         }
         
         let apiKey = "16e4d20620e968bb2ac7b6075dd69d43"
@@ -150,7 +152,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             if response != nil {
                 cell.posterView.alpha = 0
                 cell.posterView.image = image
-                UIView.animate(withDuration: 0.3, animations: { 
+                UIView.animate(withDuration: 0.5, animations: {
                     cell.posterView.alpha = 1
                 })
             }
@@ -298,7 +300,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             if response != nil {
                 cell.posterView.alpha = 0
                 cell.posterView.image = image
-                UIView.animate(withDuration: 0.3, animations: {
+                UIView.animate(withDuration: 0.5, animations: {
                     cell.posterView.alpha = 1
                 })
             }
@@ -451,7 +453,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     @IBAction func networkErrorButtonTapped(_ sender: Any) {
         animateRetractingNetworkErrorButton()
-        loadMovies(at: page)
     }
     
     func animateNetworkErrorButton() {
@@ -468,13 +469,14 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             self.networkErrorButton.frame = CGRect(x: 0, y: 0 - self.networkErrorButton.frame.height + yValue, width: self.networkErrorButton.frame.width, height: self.networkErrorButton.frame.height)
         }, completion: { (isComplete) in
             self.networkErrorButton.isHidden = true
+            self.loadMovies(at: self.page)
         })
     }
 
     @IBAction func onPinchGesture(_ sender: UIPinchGestureRecognizer) {
         var pinchScale  = sender.scale
         if sender.scale < 1 && !onFront {
-            if let indexPath = tableView.indexPathsForVisibleRows?[0] {
+            if tableView.indexPathsForVisibleRows?.count != 0, let indexPath = tableView.indexPathsForVisibleRows?[0] {
                 collectionView.scrollToItem(at: indexPath, at: .top, animated: false)
             }
             if sender.scale < 0.2 {
@@ -495,7 +497,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             }
         }
         else if sender.scale > 1 && onFront {
-            tableView.scrollToRow(at: collectionView.indexPathsForVisibleItems[0], at: .top, animated: false)
+            if collectionView.indexPathsForVisibleItems.count != 0 {
+                tableView.scrollToRow(at: collectionView.indexPathsForVisibleItems[0], at: .top, animated: false)
+            }
             if sender.scale > 5 {
                 pinchScale = 5
             }
@@ -515,14 +519,16 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         }
         if 0.8 < pinchScale && pinchScale < 1.2 && sender.state == UIGestureRecognizerState.ended {
             if onFront {
-                tableView.scrollToRow(at: collectionView.indexPathsForVisibleItems[0], at: .top, animated: false)
+                if collectionView.indexPathsForVisibleItems.count != 0 {
+                    tableView.scrollToRow(at: collectionView.indexPathsForVisibleItems[0], at: .top, animated: false)
+                }
                 collectionView.alpha = 1
                 tableView.alpha = 0
                 self.tableView.isUserInteractionEnabled = false
                 self.collectionView.isUserInteractionEnabled = true
             }
             else {
-                if let indexPath = tableView.indexPathsForVisibleRows?[0] {
+                if tableView.indexPathsForVisibleRows?.count != 0, let indexPath = tableView.indexPathsForVisibleRows?[0] {
                     collectionView.scrollToItem(at: indexPath, at: .top, animated: false)
                 }
                 collectionView.alpha = 0
