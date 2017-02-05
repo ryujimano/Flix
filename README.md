@@ -2,7 +2,7 @@
 
 Flicks is a movies app using the [The Movie Database API](http://docs.themoviedb.apiary.io/#).
 
-Time spent: **X** hours spent in total
+Time spent: 18 hours spent in total
 
 ## User Stories
 
@@ -24,24 +24,27 @@ The following **optional** features are implemented:
 The following **additional** features are implemented:
 
 - Implemented pagination to the app to retrieve more movies.
-- Implemented the respective ratings for each movie.
+- Implemented the ratings for each movie.
+- Implemented a pinch gesture to translate between two views.
+- Implemented a custom refresh control.
 
 Please list two areas of the assignment you'd like to **discuss further with your peers** during the next class (examples include better ways to implement something, how to extend your app in certain ways, etc):
 
-1. 
-2. 
+1. More ways to customize the UI
+2. More ways to improve/extend the app
 
 ## Video Walkthrough 
 
 Here's a walkthrough of implemented user stories:
 
-[//]: # "<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />"
+![alt text](https://github.com/ryujimano/Flicks/FlicksDemo.gif "FlicksDemo")
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
-Describe any challenges encountered while building the app.
+One challenge that I faced when making this app was when I was implementing the pinch gesture feature. I had to take into consideration the scale of the pinch gesture and the positioning of the collection and the table views.
+Another challenge that I faced was the implementation of the custom refresh control. When customizing the refresh control, I had to take into consideration the height of the refresh control bounds when rotating the icon.
 
 ## License
 
