@@ -142,6 +142,7 @@
                                                 </imageView>
                                             </subviews>
                                         </view>
+                                        <gestureRecognizers/>
                                         <connections>
                                             <outlet property="posterView" destination="tkp-BF-keW" id="GHd-mv-v3q"/>
                                             <outlet property="star1" destination="PEZ-Y8-The" id="dqW-K0-wbh"/>
