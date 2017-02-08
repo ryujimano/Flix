@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AFNetworking
 
 class DetailViewController: UIViewController {
     @IBOutlet weak var posterView: UIImageView!
@@ -20,6 +21,14 @@ class DetailViewController: UIViewController {
         
         titleLabel.text = movie["title"] as! String
         overViewLabel.text = movie["overview"] as! String
+        
+        
+        let baseURL = "https://image.tmdb.org/t/p/w500"
+        
+        if let posterPath = movie["poster_path"] as? String {
+            let posterURL = URL(string: baseURL + posterPath)
+            posterView.setImageWith(posterURL!)
+        }
     }
 
     override func didReceiveMemoryWarning() {
