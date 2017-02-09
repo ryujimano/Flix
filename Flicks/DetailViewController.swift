@@ -24,6 +24,8 @@ class DetailViewController: UIViewController {
         titleLabel.text = movie["title"] as? String
         overViewLabel.text = movie["overview"] as? String
         
+        overViewLabel.sizeToFit()
+        
         scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: detailView.frame.origin.y + detailView.frame.size.height)
         
         
