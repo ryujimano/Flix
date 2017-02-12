@@ -51,10 +51,20 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         networkErrorButton.isHidden = true
         
         //initial configuration of the tableview and the collectionview
-        tableView.alpha = 0
-        collectionView.alpha = 1
-        
-        tableView.isUserInteractionEnabled = false
+        if onFront {
+            tableView.alpha = 0
+            collectionView.alpha = 1
+            
+            collectionView.isUserInteractionEnabled = true
+            tableView.isUserInteractionEnabled = false
+        }
+        else {
+            collectionView.alpha = 0
+            tableView.alpha = 1
+            
+            tableView.isUserInteractionEnabled = true
+            collectionView.isUserInteractionEnabled = false
+        }
     }
     
     override func viewDidLoad() {
@@ -379,6 +389,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             page += 1
             loadMovies(at: page)
         }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     

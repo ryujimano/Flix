@@ -17,6 +17,7 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var detailView: UIView!
     
     var movie: NSDictionary!
+    var posterURL:URL?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,18 +26,20 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
         overViewLabel.text = movie["overview"] as? String
         
         overViewLabel.sizeToFit()
+        detailView.frame.size.height = overViewLabel.frame.origin.y + overViewLabel.frame.height + 10
         
-        scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: detailView.frame.origin.y + detailView.frame.size.height)
+        scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: detailView.frame.origin.y + detailView.frame.size.height + (tabBarController?.tabBar.frame.height)!)
         
         
         let baseURL = "https://image.tmdb.org/t/p/w500"
         
         if let posterPath = movie["poster_path"] as? String {
-            let posterURL = URL(string: baseURL + posterPath)
+            posterURL = URL(string: baseURL + posterPath)
             posterView.setImageWith(posterURL!)
         }
         
         scrollView.delegate = self
+        scrollView.showsVerticalScrollIndicator = false
     }
 
     override func didReceiveMemoryWarning() {
@@ -44,22 +47,6 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
         // Dispose of any resources that can be recreated.
     }
     
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if !UIAccessibilityIsReduceTransparencyEnabled() {
-            scrollView.backgroundColor = .clear
-            
-            let blur = UIBlurEffect(style: .dark)
-            let blurView = UIVisualEffectView(effect: blur)
-            
-            blurView.frame = self.scrollView.bounds
-            blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            
-            posterView.addSubview(blurView)
-        }
-    }
-    
-
     /*
     // MARK: - Navigation
 
