@@ -11,6 +11,7 @@ import AFNetworking
 import MBProgressHUD
 
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UICollectionViewDelegate, UICollectionViewDataSource {
+    
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var networkErrorButton: UIButton!
     @IBOutlet weak var movieSearchBar: UISearchBar!
@@ -20,6 +21,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     
     var movies:[NSDictionary]?
+    var endpoint:String!
     
     //variable of the page number used for API calls
     var page = 0
@@ -136,7 +138,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         //API call
         let apiKey = "16e4d20620e968bb2ac7b6075dd69d43"
-        let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)&page=\(page)")!
+        print("https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)&page=\(page)")
+        let url = URL(string: "https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)&page=\(page)")!
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
         let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
         
@@ -188,7 +191,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         //API call
         let apiKey = "16e4d20620e968bb2ac7b6075dd69d43"
-        let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")!
+        let url = URL(string: "https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)")!
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
         let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
         let task: URLSessionDataTask = session.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) in
