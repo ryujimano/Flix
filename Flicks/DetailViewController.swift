@@ -9,7 +9,7 @@
 import UIKit
 import AFNetworking
 
-class DetailViewController: UIViewController {
+class DetailViewController: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var posterView: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var overViewLabel: UILabel!
@@ -35,11 +35,28 @@ class DetailViewController: UIViewController {
             let posterURL = URL(string: baseURL + posterPath)
             posterView.setImageWith(posterURL!)
         }
+        
+        scrollView.delegate = self
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if !UIAccessibilityIsReduceTransparencyEnabled() {
+            scrollView.backgroundColor = .clear
+            
+            let blur = UIBlurEffect(style: .dark)
+            let blurView = UIVisualEffectView(effect: blur)
+            
+            blurView.frame = self.scrollView.bounds
+            blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            
+            posterView.addSubview(blurView)
+        }
     }
     
 
