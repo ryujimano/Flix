@@ -111,14 +111,18 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         //set custom view bounds equal to refreshControl bounds
         customView.frame = refreshControl.bounds
         
-        //animate color of refreshControl background (repeated color change from black to yellow)
-        UIView.animate(withDuration: 0.5, delay: 0, options: [.autoreverse, .curveLinear, .repeat], animations: { 
-            self.customView.backgroundColor = .black
-            self.customView.backgroundColor = .yellow
-        }, completion: nil)
+        customView.backgroundColor = .black
         
         //add custom view to refreshControl
         refreshControl.addSubview(customView)
+    }
+    
+    func animateRefreshControl() {
+        //animate color of refreshControl background (repeated color change from black to yellow)
+        UIView.animate(withDuration: 0.5, delay: 0, options: [.autoreverse, .curveLinear, .repeat], animations: {
+            self.customView.backgroundColor = .black
+            self.customView.backgroundColor = .yellow
+        }, completion: nil)
     }
     
     
@@ -148,7 +152,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         //API call
         let apiKey = "16e4d20620e968bb2ac7b6075dd69d43"
-        print("https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)&page=\(page)")
         let url = URL(string: "https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)&page=\(page)")!
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
         let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
@@ -192,6 +195,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     //function for API call used when the user refreshes the contents
     func loadMovies(_ refreshControl:UIRefreshControl) {
+        animateRefreshControl()
+        
         //if network error button is hidden, retract the button and end refreshing
         if !networkErrorButton.isHidden {
             animateRetractingNetworkErrorButton()
@@ -221,6 +226,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     self.collectionView.reloadData()
                     
                     refreshControl.endRefreshing()
+                    
+                    self.customView.backgroundColor = .black
                 }
             }
         }
