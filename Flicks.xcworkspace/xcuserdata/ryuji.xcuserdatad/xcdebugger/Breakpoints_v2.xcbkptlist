@@ -154,11 +154,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Flicks/MoviesViewController.swift"
-            timestampString = "508702081.515036"
+            timestampString = "508711579.030007"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "720"
-            endingLineNumber = "720"
+            startingLineNumber = "521"
+            endingLineNumber = "521"
             landmarkName = "onPinchGesture(_:)"
             landmarkType = "7">
          </BreakpointContent>

@@ -43,8 +43,12 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
         
         detailView.frame.size.height = overViewLabel.frame.origin.y + overViewLabel.frame.height + 10
         detailView.layer.cornerRadius = 10
-        detailView.frame.origin.y = view.frame.height - (tabBarController?.tabBar.frame.height)! - titleLabel.frame.height - 20
+        detailView.frame.origin.y = view.frame.height - (tabBarController?.tabBar.frame.height)! - titleLabel.frame.height - 18
         
+        if let rating = movie["vote_average"] as? Double {
+            Model.getStars(of: rating, with: star1, star2, star3, star4, star5)
+            ratingLabel.text = String(format: "%.1f/10", rating)
+        }
         
         let baseURL = "https://image.tmdb.org/t/p/"
         
