@@ -16,6 +16,15 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var detailView: UIView!
     
+    @IBOutlet weak var ratingsView: UIView!
+    @IBOutlet weak var star1: UIImageView!
+    @IBOutlet weak var star2: UIImageView!
+    @IBOutlet weak var star3: UIImageView!
+    @IBOutlet weak var star4: UIImageView!
+    @IBOutlet weak var star5: UIImageView!
+    @IBOutlet weak var ratingLabel: UILabel!
+    
+    
     var movie: NSDictionary!
     var posterURL:URL?
 
@@ -25,10 +34,16 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
         titleLabel.text = movie["title"] as? String
         overViewLabel.text = movie["overview"] as? String
         
-        overViewLabel.sizeToFit()
-        detailView.frame.size.height = overViewLabel.frame.origin.y + overViewLabel.frame.height + 10
+        titleLabel.sizeToFit()
         
-        scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: detailView.frame.origin.y + detailView.frame.size.height + (tabBarController?.tabBar.frame.height)!)
+        ratingsView.frame.origin.y = titleLabel.frame.origin.y + titleLabel.frame.height + 10
+        
+        overViewLabel.frame.origin.y = ratingsView.frame.origin.y + ratingsView.frame.height + 10
+        overViewLabel.sizeToFit()
+        
+        detailView.frame.size.height = overViewLabel.frame.origin.y + overViewLabel.frame.height + 10
+        detailView.layer.cornerRadius = 10
+        detailView.frame.origin.y = view.frame.height - (tabBarController?.tabBar.frame.height)! - titleLabel.frame.height - 20
         
         
         let baseURL = "https://image.tmdb.org/t/p/"
@@ -36,6 +51,9 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
         if let posterPath = movie["poster_path"] as? String {
             setImage(with: baseURL, and: posterPath)
         }
+        
+        view.insertSubview(scrollView, at: 1)
+        scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: detailView.frame.origin.y + detailView.frame.size.height + (tabBarController?.tabBar.frame.height)! + 5)
         
         scrollView.delegate = self
         scrollView.showsVerticalScrollIndicator = false

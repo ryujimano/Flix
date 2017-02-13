@@ -100,6 +100,22 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         setUpRefreshControl()
         refreshControl.addTarget(self, action: #selector(loadMovies(_:)), for: .valueChanged)
         collectionView.insertSubview(refreshControl, at: 0)
+        
+        
+        if let navigationBar = navigationController?.navigationBar {
+            navigationBar.tintColor = .yellow
+            navigationBar.barTintColor = .black
+            navigationBar.subviews.first?.alpha = 0.7
+        }
+        movieSearchBar.sizeToFit()
+        navigationItem.titleView = movieSearchBar
+        
+        if let tabBar = tabBarController?.tabBar {
+            tabBar.tintColor = .yellow
+            tabBar.barTintColor = .black
+            tabBar.alpha = 0.7
+        }
+        
     }
     
     
@@ -278,6 +294,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         }) { (imageRequest, response, error) in
         }
         
+        cell.selectionStyle = .none
+        
         //add rating stars to the cell
         if let rating = movie["vote_average"] as? Double {
             if rating < 1.6 {
@@ -399,7 +417,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+        tableView.deselectRow(at: indexPath, animated: false)
     }
     
     
