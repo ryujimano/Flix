@@ -31,11 +31,10 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
         scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: detailView.frame.origin.y + detailView.frame.size.height + (tabBarController?.tabBar.frame.height)!)
         
         
-        let baseURL = "https://image.tmdb.org/t/p/w500"
+        let baseURL = "https://image.tmdb.org/t/p/"
         
         if let posterPath = movie["poster_path"] as? String {
-            posterURL = URL(string: baseURL + posterPath)
-            posterView.setImageWith(posterURL!)
+            setImage(with: baseURL, and: posterPath)
         }
         
         scrollView.delegate = self
@@ -45,6 +44,28 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func setImage(with baseURL: String, and posterPath: String) {
+        let smallImageRequest = URLRequest(url: URL(string: baseURL + "w45" + posterPath)!)
+        let largeImageRequest = URLRequest(url: URL(string: baseURL + "original" + posterPath)!)
+        
+        posterView.setImageWith(smallImageRequest, placeholderImage: nil, success: { (req, res, smallImage) in
+            self.posterView.alpha = 0
+            self.posterView.image = smallImage
+            
+            UIView.animate(withDuration: 0.3, animations: {
+                self.posterView.alpha = 1
+            }, completion: { (isComplete) in
+                    self.posterView.setImageWith(largeImageRequest, placeholderImage: nil, success: { (req, res, largeImage) in
+                        self.posterView.image = largeImage
+                    }, failure: { (req, res, error) in
+                        self.posterView.setImageWith(URL(string: baseURL + "original" + posterPath)!)
+                })
+            })
+        }) { (req, res, error) in
+            self.posterView.setImageWith(URL(string: baseURL + "original" + posterPath)!)
+        }
     }
     
     /*
