@@ -63,7 +63,9 @@ Another challenge that I faced was the implementation of the custom refresh cont
     limitations under the License.
 
 
-
+<br/>
+<br/>
+<br />
 
 # Project 2 - *Flicks*
 
