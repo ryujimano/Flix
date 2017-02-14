@@ -14,19 +14,16 @@ PODS:
   - AFNetworking/Serialization (3.1.0)
   - AFNetworking/UIKit (3.1.0):
     - AFNetworking/NSURLSession
-  - Blurry (0.0.3)
   - MBProgressHUD (1.0.0)
 
 DEPENDENCIES:
   - AFNetworking
-  - Blurry
   - MBProgressHUD
 
 SPEC CHECKSUMS:
   AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
-  Blurry: a4094166307e75a7e29d9f8219106ed4e3064c8a
   MBProgressHUD: 4890f671c94e8a0f3cf959aa731e9de2f036d71a
 
-PODFILE CHECKSUM: 597e399aca2ecb6583d1b3d2463c65534f5374be
+PODFILE CHECKSUM: 3f2310d5695fb105a30494f58f83ec6219a4c5a9
 
 COCOAPODS: 1.1.1

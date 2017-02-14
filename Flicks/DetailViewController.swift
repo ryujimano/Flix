@@ -9,7 +9,7 @@
 import UIKit
 import AFNetworking
 
-class DetailViewController: UIViewController, UIScrollViewDelegate {
+class DetailViewController: UIViewController, UIScrollViewDelegate, UICollectionViewDelegate, UICollectionViewDataSource {
     @IBOutlet weak var posterView: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var overViewLabel: UILabel!
@@ -24,9 +24,16 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var star5: UIImageView!
     @IBOutlet weak var ratingLabel: UILabel!
     
+    @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var reviewButton: UIButton!
+    @IBOutlet weak var similarLabel: UILabel!
+    @IBOutlet weak var bottomView: UIView!
+    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
+    
     
     var movie: NSDictionary!
     var posterURL:URL?
+    var similarMovies: [NSDictionary]?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,7 +48,9 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
         overViewLabel.frame.origin.y = ratingsView.frame.origin.y + ratingsView.frame.height + 10
         overViewLabel.sizeToFit()
         
-        detailView.frame.size.height = overViewLabel.frame.origin.y + overViewLabel.frame.height + 10
+        bottomView.frame.origin.y = overViewLabel.frame.origin.y + overViewLabel.frame.height + 10
+        
+        detailView.frame.size.height = bottomView.frame.origin.y + bottomView.frame.height + 10
         detailView.layer.cornerRadius = 10
         detailView.frame.origin.y = view.frame.height - (tabBarController?.tabBar.frame.height)! - titleLabel.frame.height - 18
         
@@ -57,10 +66,25 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
         }
         
         view.insertSubview(scrollView, at: 1)
-        scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: detailView.frame.origin.y + detailView.frame.size.height + (tabBarController?.tabBar.frame.height)! + 5)
+        scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: detailView.frame.origin.y + detailView.frame.height + (tabBarController?.tabBar.frame.height)! + 5)
         
         scrollView.delegate = self
         scrollView.showsVerticalScrollIndicator = false
+        
+        if let id = movie["id"] as? Int {
+            loadSimilarMovies(of: id)
+        }
+        
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        
+        //configure collectionview
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        flowLayout.scrollDirection = .horizontal
+        flowLayout.minimumLineSpacing = 0
+        flowLayout.minimumInteritemSpacing = 0
+        flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }
 
     override func didReceiveMemoryWarning() {
@@ -90,14 +114,67 @@ class DetailViewController: UIViewController, UIScrollViewDelegate {
         }
     }
     
-    /*
+    
+    func loadSimilarMovies(of movieID:Int) {
+        //API call
+        let apiKey = "16e4d20620e968bb2ac7b6075dd69d43"
+        let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieID)/similar?api_key=\(apiKey)")!
+        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
+        let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
+        
+        let task: URLSessionDataTask = session.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) in
+            
+            //if an error occurred
+            if error != nil {
+            }
+            
+            if let data = data {
+                if let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
+                    self.similarMovies = dataDictionary["results"] as? [NSDictionary]
+                    
+                    //reload data
+                    self.collectionView.reloadData()
+                }
+            }
+            //end loading display
+        }
+        task.resume()
+
+    }
+    
+    
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return similarMovies?.count ?? 0
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "similarCell", for: indexPath) as! SimilarMovieCollectionViewCell
+        
+        let similarMovie = similarMovies?[indexPath.row]
+        
+        guard let posterPath = similarMovie?["poster_path"] as? String else {
+            return cell
+        }
+        
+        cell.posterView.setImageWith(URL(string: "https://image.tmdb.org/t/p/original" + posterPath)!)
+        
+        return cell
+    }
+    
+    
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        let destination = segue.destination as! ReviewViewController
+        
+        if let id = movie["id"] as? Int {
+            destination.id = id
+        }
+        
     }
-    */
+    
 
 }

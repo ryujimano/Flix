@@ -18,6 +18,9 @@
 		467CBB971E412A3D0012C65C /* MovieCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467CBB961E412A3D0012C65C /* MovieCell.swift */; };
 		469A40271E44F6EE00C2362C /* MovieCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469A40261E44F6EE00C2362C /* MovieCollectionViewCell.swift */; };
 		46FBE2511E524E7600C55DEC /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46FBE2501E524E7600C55DEC /* Model.swift */; };
+		46FBE2531E525BC600C55DEC /* ReviewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46FBE2521E525BC600C55DEC /* ReviewTableViewCell.swift */; };
+		46FBE2551E525C0E00C55DEC /* ReviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46FBE2541E525C0E00C55DEC /* ReviewViewController.swift */; };
+		46FBE2571E52850F00C55DEC /* SimilarMovieCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46FBE2561E52850E00C55DEC /* SimilarMovieCollectionViewCell.swift */; };
 		9C3D1E15143A102AACEFC9FC /* Pods_Flicks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4803A5B13509AED7F854DEF3 /* Pods_Flicks.framework */; };
 /* End PBXBuildFile section */
 
@@ -36,6 +39,9 @@
 		467CBB961E412A3D0012C65C /* MovieCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieCell.swift; sourceTree = "<group>"; };
 		469A40261E44F6EE00C2362C /* MovieCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieCollectionViewCell.swift; sourceTree = "<group>"; };
 		46FBE2501E524E7600C55DEC /* Model.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		46FBE2521E525BC600C55DEC /* ReviewTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReviewTableViewCell.swift; sourceTree = "<group>"; };
+		46FBE2541E525C0E00C55DEC /* ReviewViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReviewViewController.swift; sourceTree = "<group>"; };
+		46FBE2561E52850E00C55DEC /* SimilarMovieCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimilarMovieCollectionViewCell.swift; sourceTree = "<group>"; };
 		4803A5B13509AED7F854DEF3 /* Pods_Flicks.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Flicks.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FAD87020D60DDFD1747DC667 /* Pods-Flicks.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Flicks.release.xcconfig"; path = "Pods/Target Support Files/Pods-Flicks/Pods-Flicks.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -109,6 +115,8 @@
 				467CBB961E412A3D0012C65C /* MovieCell.swift */,
 				469A40261E44F6EE00C2362C /* MovieCollectionViewCell.swift */,
 				465D47DB1E47AC8800271242 /* RefreshView.xib */,
+				46FBE2521E525BC600C55DEC /* ReviewTableViewCell.swift */,
+				46FBE2561E52850E00C55DEC /* SimilarMovieCollectionViewCell.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -118,6 +126,7 @@
 			children = (
 				467CBB921E40E1B10012C65C /* MoviesViewController.swift */,
 				465D4A0E1E4AD5DF00271242 /* DetailViewController.swift */,
+				46FBE2541E525C0E00C55DEC /* ReviewViewController.swift */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -267,8 +276,11 @@
 				467CBB811E40E11E0012C65C /* AppDelegate.swift in Sources */,
 				467CBB931E40E1B10012C65C /* MoviesViewController.swift in Sources */,
 				465D4A0F1E4AD5DF00271242 /* DetailViewController.swift in Sources */,
+				46FBE2571E52850F00C55DEC /* SimilarMovieCollectionViewCell.swift in Sources */,
 				46FBE2511E524E7600C55DEC /* Model.swift in Sources */,
 				467CBB971E412A3D0012C65C /* MovieCell.swift in Sources */,
+				46FBE2531E525BC600C55DEC /* ReviewTableViewCell.swift in Sources */,
+				46FBE2551E525C0E00C55DEC /* ReviewViewController.swift in Sources */,
 				469A40271E44F6EE00C2362C /* MovieCollectionViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
