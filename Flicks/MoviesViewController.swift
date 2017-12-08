@@ -149,7 +149,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         //if 1 < height of the refreshControl <= 60, rotate the icon
         if refreshControl.bounds.height > 1  && refreshControl.bounds.height <= 60 {
-            icon.transform = CGAffineTransform(rotationAngle: CGFloat(M_PI) + CGFloat(M_PI) * (refreshControl.bounds.height / CGFloat(60)))
+            icon.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi) + CGFloat(Double.pi) * (refreshControl.bounds.height / CGFloat(60)))
         }
         //if height of the refreshControl > 60, keep icon upright
         else if refreshControl.bounds.height > 60 {
@@ -210,7 +210,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     //function for API call used when the user refreshes the contents
-    func loadMovies(_ refreshControl:UIRefreshControl) {
+    @objc func loadMovies(_ refreshControl:UIRefreshControl) {
         animateRefreshControl()
         
         //if network error button is hidden, retract the button and end refreshing

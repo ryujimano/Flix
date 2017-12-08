@@ -52,7 +52,7 @@ class DetailViewController: UIViewController, UIScrollViewDelegate, UICollection
         
         detailView.frame.size.height = bottomView.frame.origin.y + bottomView.frame.height + 10
         detailView.layer.cornerRadius = 10
-        detailView.frame.origin.y = view.frame.height - (tabBarController?.tabBar.frame.height)! - titleLabel.frame.height - 18
+        detailView.frame.origin.y = view.frame.height - (tabBarController?.tabBar.frame.size.height ?? 0) - titleLabel.frame.size.height - titleLabel.frame.origin.y
         
         if let rating = movie["vote_average"] as? Double {
             Model.getStars(of: rating, with: star1, star2, star3, star4, star5)
@@ -66,7 +66,7 @@ class DetailViewController: UIViewController, UIScrollViewDelegate, UICollection
         }
         
         view.insertSubview(scrollView, at: 1)
-        scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: detailView.frame.origin.y + detailView.frame.height + (tabBarController?.tabBar.frame.height)! + 5)
+        scrollView.contentSize = CGSize(width: self.view.frame.size.width, height: detailView.frame.origin.y + detailView.frame.height)
         
         scrollView.delegate = self
         scrollView.showsVerticalScrollIndicator = false
