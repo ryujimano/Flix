@@ -17,8 +17,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     @IBOutlet weak var movieSearchBar: UISearchBar!
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
-    @IBOutlet var pinchGestureRecognizer: UIPinchGestureRecognizer!
-    
+//    @IBOutlet var pinchGestureRecognizer: UIPinchGestureRecognizer!
+
     
     var movies:[NSDictionary]?
     var endpoint:String!
@@ -51,14 +51,13 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         networkErrorButton.isHidden = true
         
         //initial configuration of the tableview and the collectionview
-        if onFront {
+        if endpoint == "similar" {
             tableView.alpha = 0
             collectionView.alpha = 1
             
             collectionView.isUserInteractionEnabled = true
             tableView.isUserInteractionEnabled = false
-        }
-        else {
+        } else {
             collectionView.alpha = 0
             tableView.alpha = 1
             
@@ -70,20 +69,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //configure tableview
-        tableView.dataSource = self
-        tableView.delegate = self
-        
         //configure search bar
         movieSearchBar.delegate = self
-        
-        //configure collectionview
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        flowLayout.scrollDirection = .vertical
-        flowLayout.minimumLineSpacing = 0
-        flowLayout.minimumInteritemSpacing = 0
-        flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         
         //set page to 1 initially
         page += 1
@@ -99,8 +86,23 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         refreshControl.backgroundColor = .clear
         setUpRefreshControl()
         refreshControl.addTarget(self, action: #selector(loadMovies(_:)), for: .valueChanged)
-        collectionView.insertSubview(refreshControl, at: 0)
-        
+        if endpoint == "similar" {
+            //configure collectionview
+            collectionView.dataSource = self
+            collectionView.delegate = self
+            flowLayout.scrollDirection = .vertical
+            flowLayout.minimumLineSpacing = 0
+            flowLayout.minimumInteritemSpacing = 0
+            flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+            collectionView.insertSubview(refreshControl, at: 0)
+        } else {
+            //configure tableview
+            tableView.dataSource = self
+            tableView.delegate = self
+            tableView.rowHeight = UITableViewAutomaticDimension
+            tableView.estimatedRowHeight = 190.0
+            tableView.insertSubview(self.refreshControl, at: 0)
+        }
         
         if let navigationBar = navigationController?.navigationBar {
             navigationBar.tintColor = .yellow
@@ -163,12 +165,15 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     // MARK - API Calls
     //
     func loadMovies(at page:Int) {
-        //when loading movies, disable pinch gesture
-        pinchGestureRecognizer.isEnabled = false
         
         //API call
         let apiKey = "16e4d20620e968bb2ac7b6075dd69d43"
-        let url = URL(string: "https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)&page=\(page)")!
+        var url: URL
+        if endpoint == "similar" {
+            url = URL(string: "https://api.themoviedb.org/3/movie/297762/\(endpoint!)?api_key=\(apiKey)&page=\(page)")!
+        } else {
+            url = URL(string: "https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)&page=\(page)")!
+        }
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
         let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
         
@@ -205,8 +210,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         }
         task.resume()
         
-        //enable pinch gesture
-        pinchGestureRecognizer.isEnabled = true
     }
     
     //function for API call used when the user refreshes the contents
@@ -214,15 +217,20 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         animateRefreshControl()
         
         //if network error button is hidden, retract the button and end refreshing
-        if !networkErrorButton.isHidden {
-            animateRetractingNetworkErrorButton()
-            refreshControl.endRefreshing()
-            return
-        }
+//        if !networkErrorButton.isHidden {
+//            animateRetractingNetworkErrorButton()
+//            refreshControl.endRefreshing()
+//            return
+//        }
         
         //API call
         let apiKey = "16e4d20620e968bb2ac7b6075dd69d43"
-        let url = URL(string: "https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)")!
+        var url: URL
+        if endpoint == "similar" {
+            url = URL(string: "https://api.themoviedb.org/3/movie/297762/\(endpoint!)?api_key=\(apiKey)&page=\(page)")!
+        } else {
+            url = URL(string: "https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)&page=\(page)")!
+        }
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
         let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
         let task: URLSessionDataTask = session.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) in
@@ -440,6 +448,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             self.networkErrorButton.isHidden = false
             let yValue = UIApplication.shared.statusBarFrame.height + self.movieSearchBar.frame.height - 1
             self.networkErrorButton.frame = CGRect(x: 0, y: yValue, width: self.networkErrorButton.frame.width, height: self.networkErrorButton.frame.height)
+        }, completion: { isComplete in
+            self.networkErrorButton.isHidden = false
         })
         
     }
@@ -461,85 +471,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     
-    
-    
-    //
-    // MARK - Pinch Gesture
-    //
-    @IBAction func onPinchGesture(_ sender: UIPinchGestureRecognizer) {
-        
-        var pinchScale  = sender.scale
-        
-        //if user is pinching inwards, translate from tableview to collectionview
-        if sender.scale < 1 && !onFront {
-            if tableView.indexPathsForVisibleRows?.count != 0, let indexPath = tableView.indexPathsForVisibleRows?[0] {
-                collectionView.scrollToItem(at: indexPath, at: .top, animated: false)
-            }
-            if sender.scale < 0.2 {
-                pinchScale = 0.2
-            }
-            tableView.alpha = pinchScale
-            collectionView.alpha = 1 - pinchScale
-            if pinchScale <= 0.8 && sender.state == UIGestureRecognizerState.ended {
-                onFront = true
-                UIView.animate(withDuration: 0.3, animations: {
-                    self.collectionView.alpha = 1
-                }, completion: { (complete) in
-                    self.tableView.alpha = 0
-                    self.collectionView.isUserInteractionEnabled = true
-                    self.tableView.isUserInteractionEnabled = false
-                    self.collectionView.insertSubview(self.refreshControl, at: 0)
-                })
-            }
-        }
-        //if user is pinching outwards, translate from collectionview to tableview
-        else if sender.scale > 1 && onFront {
-            if collectionView.indexPathsForVisibleItems.count != 0 {
-                tableView.scrollToRow(at: collectionView.indexPathsForVisibleItems[0], at: .top, animated: false)
-            }
-            if sender.scale > 5 {
-                pinchScale = 5
-            }
-            tableView.alpha = pinchScale / 6.25
-            collectionView.alpha = 1 - (pinchScale / 6.25)
-            if pinchScale >= 1.2 && sender.state == UIGestureRecognizerState.ended {
-                onFront = false
-                UIView.animate(withDuration: 0.3, animations: {
-                    self.tableView.alpha = 1
-                    self.collectionView.alpha = 0
-                }, completion: { (complete) in
-                    self.tableView.isUserInteractionEnabled = true
-                    self.collectionView.isUserInteractionEnabled = false
-                    self.tableView.insertSubview(self.refreshControl, at: 0)
-                })
-            }
-        }
-        
-        //if the pinch gesture was not adequate enough, return to collectionview or tableview
-        if 0.8 < pinchScale && pinchScale < 1.2 && sender.state == UIGestureRecognizerState.ended {
-            if onFront {
-                if collectionView.indexPathsForVisibleItems.count != 0 {
-                    tableView.scrollToRow(at: collectionView.indexPathsForVisibleItems[0], at: .top, animated: false)
-                }
-                collectionView.alpha = 1
-                tableView.alpha = 0
-                self.tableView.isUserInteractionEnabled = false
-                self.collectionView.isUserInteractionEnabled = true
-            }
-            else {
-                if tableView.indexPathsForVisibleRows?.count != 0, let indexPath = tableView.indexPathsForVisibleRows?[0] {
-                    collectionView.scrollToItem(at: indexPath, at: .top, animated: false)
-                }
-                collectionView.alpha = 0
-                tableView.alpha = 1
-                self.tableView.isUserInteractionEnabled = true
-                self.collectionView.isUserInteractionEnabled = false
-            }
-        }
-    }
-    
-    
-    
+
     
     //
     // MARK: Navigation

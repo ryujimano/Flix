@@ -30,7 +30,10 @@ class DetailViewController: UIViewController, UIScrollViewDelegate, UICollection
     @IBOutlet weak var bottomView: UIView!
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
-    
+    @IBOutlet weak var detailViewTopConstraint: NSLayoutConstraint!
+    @IBOutlet weak var detailViewWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak var detailViewHeightConstraint: NSLayoutConstraint!
+
     var movie: NSDictionary!
     var posterURL:URL?
     var similarMovies: [NSDictionary]?
@@ -50,9 +53,10 @@ class DetailViewController: UIViewController, UIScrollViewDelegate, UICollection
         
         bottomView.frame.origin.y = overViewLabel.frame.origin.y + overViewLabel.frame.height + 10
         
-        detailView.frame.size.height = bottomView.frame.origin.y + bottomView.frame.height + 10
+        detailViewHeightConstraint.constant = bottomView.frame.origin.y + bottomView.frame.height + 10
+        detailViewWidthConstraint.constant = self.view.frame.size.width - 16.0
         detailView.layer.cornerRadius = 10
-        detailView.frame.origin.y = view.frame.height - (tabBarController?.tabBar.frame.size.height ?? 0) - titleLabel.frame.size.height - titleLabel.frame.origin.y
+        detailViewTopConstraint.constant = self.view.frame.height - (tabBarController?.tabBar.frame.size.height ?? 0) - (navigationController?.navigationBar.frame.size.height ?? 0) - 20.0 - ratingsView.frame.origin.y
         
         if let rating = movie["vote_average"] as? Double {
             Model.getStars(of: rating, with: star1, star2, star3, star4, star5)
@@ -64,6 +68,8 @@ class DetailViewController: UIViewController, UIScrollViewDelegate, UICollection
         if let posterPath = movie["poster_path"] as? String {
             setImage(with: baseURL, and: posterPath)
         }
+
+        scrollView.frame = self.view.frame
         
         view.insertSubview(scrollView, at: 1)
         scrollView.contentSize = CGSize(width: self.view.frame.size.width, height: detailView.frame.origin.y + detailView.frame.height)
@@ -85,6 +91,27 @@ class DetailViewController: UIViewController, UIScrollViewDelegate, UICollection
         flowLayout.minimumLineSpacing = 0
         flowLayout.minimumInteritemSpacing = 0
         flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(detectOrientationChange(notification:)), name: NSNotification.Name.UIDeviceOrientationDidChange, object: nil)
+    }
+
+    @objc func detectOrientationChange(notification: Notification) {
+//        let orientation = UIApplication.shared.statusBarOrientation
+//
+//        switch orientation {
+//        case .portrait:
+//
+//        case .landscapeLeft, .landscapeRight:
+//        default:
+//            break
+//        }
+        detailViewTopConstraint.constant = self.view.frame.height - (tabBarController?.tabBar.frame.size.height ?? 0) - (navigationController?.navigationBar.frame.size.height ?? 0) - 20.0 - ratingsView.frame.origin.y
+        detailViewHeightConstraint.constant = bottomView.frame.origin.y + bottomView.frame.height + 10
+        detailViewWidthConstraint.constant = self.view.frame.size.width - 16.0
+        scrollView.contentSize = CGSize(width: detailViewWidthConstraint.constant, height: detailViewTopConstraint.constant + detailViewHeightConstraint.constant)
     }
 
     override func didReceiveMemoryWarning() {
