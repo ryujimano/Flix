@@ -20,8 +20,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
 //    @IBOutlet var pinchGestureRecognizer: UIPinchGestureRecognizer!
 
     
-    var movies:[NSDictionary]?
-    var endpoint:String!
+    var movies: [Movie] = []
+    var endpoint: String!
     
     //variable of the page number used for API calls
     var page = 0
@@ -30,7 +30,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     var onFront: Bool = true
     
     //array of dictionaries filtered from movies (used for search)
-    var filteredMovies:[NSDictionary] = []
+    var filteredMovies: [Movie] = []
     
     //custom components for refreshControl
     let refreshContents = Bundle.main.loadNibNamed("RefreshView", owner: self, options: nil)
@@ -165,97 +165,96 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     // MARK - API Calls
     //
     func loadMovies(at page:Int) {
-        
-        //API call
-        let apiKey = "16e4d20620e968bb2ac7b6075dd69d43"
-        var url: URL
-        if endpoint == "similar" {
-            url = URL(string: "https://api.themoviedb.org/3/movie/297762/\(endpoint!)?api_key=\(apiKey)&page=\(page)")!
-        } else {
-            url = URL(string: "https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)&page=\(page)")!
-        }
-        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
-        let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
-        
-        //start loading display
         MBProgressHUD.showAdded(to: self.view, animated: true)
-        let task: URLSessionDataTask = session.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) in
-            
-            //if an error occurred, show network error button
-            if error != nil {
-                self.animateNetworkErrorButton()
-            }
-            
-            if let data = data {
-                if let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
-                    //if the movies array is empty, assign the resulting dictionary array to movies
-                    if self.movies == nil || self.movies?.count == 0 || page == 1 {
-                        self.movies = dataDictionary["results"] as? [NSDictionary]
-                    }
-                    //if the movies array is not empty, append the results to movies
-                    else {
-                        self.movies! += (dataDictionary["results"] as! [NSDictionary])
-                    }
-                    
+
+        if endpoint == "similar" {
+            APIClient.shared.superHeroMovies(at: page, movies: self.movies, completion: { (movies, error) in
+                //end loading display
+                MBProgressHUD.hide(for: self.view, animated: true)
+                if let movies = movies {
+                    self.movies = movies
+
                     //assign movies to filteredMovies
-                    self.filteredMovies = self.movies!
-                    
+                    self.filteredMovies = self.movies
+
                     //reload data
                     self.tableView.reloadData()
                     self.collectionView.reloadData()
+                } else {
+                    self.animateNetworkErrorButton()
                 }
-            }
-            //end loading display
-            MBProgressHUD.hide(for: self.view, animated: true)
+            })
+        } else {
+            APIClient.shared.nowPlayingMovies(at: page, movies: self.movies, completion: { (movies, error) in
+                //end loading display
+                MBProgressHUD.hide(for: self.view, animated: true)
+                if let movies = movies {
+                    self.movies = movies
+
+                    //assign movies to filteredMovies
+                    self.filteredMovies = self.movies
+
+                    //reload data
+                    self.tableView.reloadData()
+                    self.collectionView.reloadData()
+                } else {
+                    self.animateNetworkErrorButton()
+                }
+            })
         }
-        task.resume()
-        
     }
     
     //function for API call used when the user refreshes the contents
     @objc func loadMovies(_ refreshControl:UIRefreshControl) {
         animateRefreshControl()
-        
-        //if network error button is hidden, retract the button and end refreshing
-//        if !networkErrorButton.isHidden {
-//            animateRetractingNetworkErrorButton()
-//            refreshControl.endRefreshing()
-//            return
-//        }
-        
-        //API call
-        let apiKey = "16e4d20620e968bb2ac7b6075dd69d43"
-        var url: URL
+
         if endpoint == "similar" {
-            url = URL(string: "https://api.themoviedb.org/3/movie/297762/\(endpoint!)?api_key=\(apiKey)&page=\(page)")!
-        } else {
-            url = URL(string: "https://api.themoviedb.org/3/movie/\(endpoint!)?api_key=\(apiKey)&page=\(page)")!
-        }
-        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
-        let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
-        let task: URLSessionDataTask = session.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) in
-            
-            //if an error occurred, end refreshing and show network error button
-            if error != nil {
-                self.animateNetworkErrorButton()
-                refreshControl.endRefreshing()
-            }
-            
-            //assign the resulting dictionary array to movies and filteredMovies, reload data, and end refreshing
-            if let data = data {
-                if let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
-                    self.movies = dataDictionary["results"] as? [NSDictionary]
-                    self.filteredMovies = self.movies!
+            APIClient.shared.superHeroMovies(at: nil, movies: [], completion: { (movies, error) in
+                //end loading display
+                MBProgressHUD.hide(for: self.view, animated: true)
+                if let movies = movies {
+                    self.movies = movies
+
+                    //assign movies to filteredMovies
+                    self.filteredMovies = self.movies
+
+                    //reload data
                     self.tableView.reloadData()
                     self.collectionView.reloadData()
-                    
+
+
                     refreshControl.endRefreshing()
-                    
+
                     self.customView.backgroundColor = .black
+                } else {
+                    self.animateNetworkErrorButton()
+                    refreshControl.endRefreshing()
                 }
-            }
+            })
+        } else {
+            APIClient.shared.nowPlayingMovies(at: nil, movies: [], completion: { (movies, error) in
+                //end loading display
+                MBProgressHUD.hide(for: self.view, animated: true)
+                if let movies = movies {
+                    self.movies = movies
+
+                    //assign movies to filteredMovies
+                    self.filteredMovies = self.movies
+
+                    //reload data
+                    self.tableView.reloadData()
+                    self.collectionView.reloadData()
+
+
+                    refreshControl.endRefreshing()
+
+                    self.customView.backgroundColor = .black
+                } else {
+                    self.animateNetworkErrorButton()
+                    refreshControl.endRefreshing()
+                }
+            })
         }
-        task.resume()
     }
     
     
@@ -276,38 +275,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         let movie = filteredMovies[indexPath.row]
         
-        //if title, overview, and poster image is nil, then return the cell
-        guard let title = movie["title"] as? String, let overview = movie["overview"] as? String, let posterPath = movie["poster_path"] as? String else {
-            return cell
-        }
-        
-        let baseURL = "https://image.tmdb.org/t/p/w500"
-        let imageRequest = URLRequest(url: URL(string: baseURL + posterPath)!)
-        
-        //add title, overview, and poster image to the cell
-        //add fade in animation to the poster image
-        cell.titleLabel.text = title
-        cell.overviewLabel.text = overview
-        cell.posterView.setImageWith(imageRequest, placeholderImage: nil, success: { (imageRequest, response, image) in
-            if response != nil {
-                cell.posterView.alpha = 0
-                cell.posterView.image = image
-                UIView.animate(withDuration: 0.5, animations: {
-                    cell.posterView.alpha = 1
-                })
-            }
-            else {
-                cell.posterView.image = image
-            }
-        }) { (imageRequest, response, error) in
-        }
-        
-        cell.selectionStyle = .none
-        
-        //add rating stars to the cell
-        if let rating = movie["vote_average"] as? Double {
-            Model.getStars(of: rating, with: cell.star1, cell.star2, cell.star3, cell.star4, cell.star5)
-        }
+        cell.setUp(with: movie)
         
         return cell
     }
@@ -344,34 +312,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         let movie = filteredMovies[indexPath.row]
         
-        //if poster image is nil, return cell
-        guard let posterPath = movie["poster_path"] as? String else {
-            return cell
-        }
-        
-        let baseURL = "https://image.tmdb.org/t/p/w500"
-        let imageRequest = URLRequest(url: URL(string: baseURL + posterPath)!)
-        
-        //add fade in animation to the poster image
-        cell.posterView.setImageWith(imageRequest, placeholderImage: nil, success: { (imageRequest, response, image) in
-            if response != nil {
-                cell.posterView.alpha = 0
-                cell.posterView.image = image
-                UIView.animate(withDuration: 0.5, animations: {
-                    cell.posterView.alpha = 1
-                })
-            }
-            else {
-                cell.posterView.image = image
-            }
-        }) { (imageRequest, response, error) in
-        }
-        
-        
-        //add rating stars to each item
-        if let rating = movie["vote_average"] as? Double {
-            Model.getStars(of: rating, with: cell.star1, cell.star2, cell.star3, cell.star4, cell.star5)
-        }
+        cell.setUp(with: movie)
         
         return cell
     }
@@ -396,8 +337,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     //
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         //filter the movies array based on the user's search
-        let filtered = searchText.isEmpty ? movies : movies?.filter({ (dataDictionary: NSDictionary) -> Bool in
-            let dataString = dataDictionary["title"] as! String
+        let filtered = searchText.isEmpty ? movies : movies.filter({ movie -> Bool in
+            let dataString = movie.title
             return dataString.lowercased().range(of: searchText.lowercased()) != nil
         })
         
@@ -479,14 +420,14 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let cell = sender as? UITableViewCell {
             let indexPath = tableView.indexPath(for: cell)
-            let movie = movies?[(indexPath?.row)!]
+            let movie = movies[(indexPath?.row)!]
             
             let destination = segue.destination as! DetailViewController
             destination.movie = movie
         }
         else if let item = sender as? UICollectionViewCell {
             let indexPath = collectionView.indexPath(for: item)
-            let movie = movies?[(indexPath?.item)!]
+            let movie = movies[(indexPath?.item)!]
             
             let destination = segue.destination as! DetailViewController
             destination.movie = movie

@@ -34,15 +34,14 @@ class DetailViewController: UIViewController, UIScrollViewDelegate, UICollection
     @IBOutlet weak var detailViewWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak var detailViewHeightConstraint: NSLayoutConstraint!
 
-    var movie: NSDictionary!
-    var posterURL:URL?
+    var movie: Movie!
     var similarMovies: [NSDictionary]?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        titleLabel.text = movie["title"] as? String
-        overViewLabel.text = movie["overview"] as? String
+        titleLabel.text = movie.title
+        overViewLabel.text = movie.overview as? String
         
         titleLabel.sizeToFit()
         
@@ -58,14 +57,14 @@ class DetailViewController: UIViewController, UIScrollViewDelegate, UICollection
         detailView.layer.cornerRadius = 10
         detailViewTopConstraint.constant = self.view.frame.height - (tabBarController?.tabBar.frame.size.height ?? 0) - (navigationController?.navigationBar.frame.size.height ?? 0) - 20.0 - ratingsView.frame.origin.y
         
-        if let rating = movie["vote_average"] as? Double {
+        if let rating = movie.ratings as? Double {
             Model.getStars(of: rating, with: star1, star2, star3, star4, star5)
             ratingLabel.text = String(format: "%.1f/10", rating)
         }
         
         let baseURL = "https://image.tmdb.org/t/p/"
         
-        if let posterPath = movie["poster_path"] as? String {
+        if let posterPath = movie.posterPath {
             setImage(with: baseURL, and: posterPath)
         }
 
@@ -77,7 +76,7 @@ class DetailViewController: UIViewController, UIScrollViewDelegate, UICollection
         scrollView.delegate = self
         scrollView.showsVerticalScrollIndicator = false
         
-        if let id = movie["id"] as? Int {
+        if let id = movie.id as? Int {
             loadSimilarMovies(of: id)
         }
         
@@ -197,7 +196,7 @@ class DetailViewController: UIViewController, UIScrollViewDelegate, UICollection
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let destination = segue.destination as! ReviewViewController
         
-        if let id = movie["id"] as? Int {
+        if let id = movie.id {
             destination.id = id
         }
         
